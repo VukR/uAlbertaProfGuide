@@ -1,14 +1,17 @@
 
 // professors [ "Hoover H", "Pilarski Patrick", "Wong Kenny"], cause problems. Dont exist/nicknames
 
+var ProfessorArray = [];
+
 window.onload = function () {
 
  	var frame = document.getElementsByName("TargetContent")[0];
 	var frameDoc = frame.contentDocument;
 	var count = 0;
 
-	//listen for change in dom, check if it is the Class Search Result
-	//have to listen for dom changes because url does not change, but content we need changes on page
+	/*listen for change in dom, check if it is the Class Search Result
+	have to listen for dom changes because url does not change, but content we need changes on page
+	find better way of listening if possible*/
 	frameDoc.addEventListener("DOMSubtreeModified", function(){
 
 		try{
@@ -28,56 +31,96 @@ window.onload = function () {
 	}, false);
 };
 
+
+//constructor for professors.
+var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatings, url){
+	this.name = name;
+	this.rating = rating;
+	this.repeat = repeat;
+	this.difficulty = difficulty;
+	this.chiliPepper = chiliPepper;
+	this.numRatings = numRatings;
+	this.url = url;
+}
+
 function grabProfNames(frameDoc){
 
 	var profArray = [];
 	var profIndex = 0;
 	var profCleanedName;
 	var profCleaned;
-	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
+	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex; //id of element containing prof name
 	var profNameParent = frameDoc.getElementById(id);
 
+	//var classCount = 0;
+	
 	while (profNameParent != null){
 
 		//finding text of child from parent profName
 		var profName = profNameParent.getElementsByTagName("div")[0].innerHTML;
 		
-		//getting id of next prof
-		// profIndex += 1;
-		// id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
-		// profNameParent = frameDoc.getElementById(id);
-
 		cleanProfName(profName)
-		//profCleanedName = profCleaned;
 		profCleanedName = profSplit;
-		profCleaned = profCleanedName[0] + " " + profCleanedName[1];
+		console.log("profCleanedName: " + profCleanedName)
+		//classCount += 1;
 
-		//check to see if prof was already added to array
-		if(profArray.indexOf(profCleaned) > -1){
+		if(profCleanedName == "To Be Assigned"){
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
 			profNameParent = frameDoc.getElementById(id);
-
 		}
+
 		else{
-			profArray.push(profCleaned);
-			console.log("Current prof: " + profCleanedName);
-			getProfURL(profCleanedName, frameDoc, id)
-			profIndex += 1;
-			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
-			profNameParent = frameDoc.getElementById(id);
-			//getProfURL(profCleanedName);
-			//console.log(profCleanedName);
+			profCleaned = profCleanedName[1] + " " + profCleanedName[0];
+			
+			//check to see if prof was already added to array
+			// if(profArray.indexOf(profCleaned) > -1){
+			// 	// for (var i = 0; i <= ProfessorArray.length; i++){
+			// 	// 	if(ProfessorArray[i].name == profCleaned){
+			// 	// 		console.log("Repeated: " + profCleaned);
+			// 	// 		// injectRating(frameDoc, id, myProf[i])
+			// 	// 		// break;
+			// 	// 	}
+			// 	// }
+			// 	// console.log("Length: " + ProfessorArray.length);
+			// 	console.log("Repeated: " + profCleaned);
+			// 	profIndex += 1;
+			// 	id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
+			// 	profNameParent = frameDoc.getElementById(id);
+
+			// }
+
+
+			//else{
+				profArray.push(profCleaned);
+				console.log("Prof to get info: " + profCleanedName);
+				getProfURL(profCleanedName, frameDoc, id)
+				//console.log("Length: " + ProfessorArray.length);
+				profIndex += 1;
+				id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
+				profNameParent = frameDoc.getElementById(id);
+				//getProfURL(profCleanedName);
+				//console.log(profCleanedName);
+			//}
 		}
 
 	}
 	console.log(profArray)
-	//getProfURL(["Hayward", "Ryan"])
+	//console.log("Number of Classes: " + classCount);
 
 }
 
 function getProfURL(profCleanedName, frameDoc, id){
 	//console.log("https://www.ratemyprofessors.com/search.jsp?query=university+of+alberta+" + profCleanedName[0] + "+" + profCleanedName[1]);
+
+	console.log("Length in getProfUrl: " + ProfessorArray.length);
+	// for (var i = 0; i <= ProfessorArray.length; i++){
+	// 	if(ProfessorArray[i].name == profCleanedName[1] + " " + profCleanedName[0]){
+	// 		console.log("Repeated prof: " + profCleanedName[1] + " " + profCleanedName[0])
+	// 	}
+	// }
+	
+
 	chrome.runtime.sendMessage({
 		method: "POST",
 		action: "xhttp",
@@ -107,58 +150,75 @@ function getRating(profurl, profCleanedName, frameDoc, id){
 		//console.log(response);
 		var rating;
 		var name;
-		var takeAgain
-		var chiliPepper
+		var takeAgain;
+		var chiliPepper;
+		var difficulty;
+		var numRatings;
+		var professorURL;
 		if(!isNaN(div.getElementsByClassName('grade')[0].innerHTML))
 		{
 			rating  = (div.getElementsByClassName('grade')[0].innerHTML);
-			name = (div.getElementsByClassName("pfname")[0].innerHTML + " " + div.getElementsByClassName("plname")[0].innerHTML).bold();
+			name = div.getElementsByClassName("pfname")[0].innerHTML + " " + div.getElementsByClassName("plname")[0].innerHTML;
 			takeAgain = (div.getElementsByClassName("grade")[1].innerHTML).trim();
 			difficulty = (div.getElementsByClassName("grade")[2].innerHTML).trim();
 			chiliPepper = div.getElementsByClassName("grade")[3].children[0].innerHTML;
 			numRatings = (div.getElementsByClassName("table-toggle rating-count active")[0].innerHTML).trim();
-
 			chiliPepper = chiliPepper.includes("cold");
+			professorURL = profurl
+
+			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
+			console.log("Length of pushing: " + ProfessorArray.length);
+			ProfessorArray.push(myProf);
+			//chiliPepper = chiliPepper.includes("cold");
 			//console.log("Would take again: " + chiliPepper);
 		}
 		else{
 			rating = "N/A";
+			name = "N/A";
+			takeAgain = "N/A";
+			difficulty = "N/A";
+			chiliPepper = "N/A";
+			numRatings = "N/A";
+			professorURL = profurl;
+
+			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings);
+			ProfessorArray.push(myProf);
 		}
 		
-		console.log(profCleanedName[0] + " " + profCleanedName[1] + " url: " + profurl + " rating: " + rating);
-		injectRating(profurl, rating, frameDoc, id, name, takeAgain, difficulty, chiliPepper, numRatings);
+		console.log(profCleanedName[0] + " " + profCleanedName[1] + " url: " + myProf.url + " rating: " + rating);
+		injectRating(frameDoc, id, myProf);
 	});
 }
 
-function injectRating(profurl, rating, frameDoc, id, name, takeAgain, difficulty, chiliPepper, numRatings){
+function injectRating(frameDoc, id, myProf){
 	var profNameParent = frameDoc.getElementById(id);
 	//profNameParent.getElementsByTagName("div")[0].innerHTML = (profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + "<a href='" + profurl  + "' target='_blank'>" + rating  + "</a>").bold();
-	profNameParent.getElementsByTagName("div")[0].innerHTML = ("<a href='" + profurl + "' target='_blank'>" + profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + rating  + "</a>").bold();
+	profNameParent.getElementsByTagName("div")[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
 
-	if(rating < 2.5)
+	if(myProf.rating < 2.5)
 	{
 		profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#ff0000"; // red = bad FF4136
 	}
-	else if (rating >= 2.5 && rating < 3.5 )
+	else if (myProf.rating >= 2.5 && myProf.rating < 3.5 )
 	{
 		profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#FFBF00"; // orange = okay FF851B
 	}
-	else if (rating >= 3.5 && rating <= 5 )
-	{
+	else if (myProf.rating >= 3.5 && myProf.rating <= 5 )
+		{
 		profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
 	}
 
-	addToolTip(profNameParent, name, rating, takeAgain, difficulty, chiliPepper, numRatings)
+	addToolTip(profNameParent, myProf)
 
 }
 
-function addToolTip(profNameParent, name, rating, takeAgain, difficulty, chiliPepper, numRatings, profurl){
+function addToolTip(profNameParent, myProf){
 	var card = document.createElement("div");
 	card.setAttribute("class", "cardContainer");
 	var image = document.createElement("img");
 	image.setAttribute("width", "139px");
 
-	if (chiliPepper){
+	if (myProf.chiliPepper){
 
 		image.src = chrome.extension.getURL("Assets/new-cold-chili.png");
 	}
@@ -167,15 +227,14 @@ function addToolTip(profNameParent, name, rating, takeAgain, difficulty, chiliPe
 		image.src = chrome.extension.getURL("Assets/new-hot-chili.png");
 	}
 	
-	"<a href='" + profurl  + "' target='_blank'>" + rating  + "</a>"
 	card.innerHTML = "<div class='card'> <div class='card-content' style = 'text-align: center;'> <div class = 'title'\
-	 style = 'text-align: center; padding-top: 20px;'> <span class='card-title' style = 'font-size: 25px;'>" + name + "</span>\
-	 </div> <span class = 'numRatings' style = 'font-size: 15px;'>" + numRatings+ "</span>\
+	 style = 'text-align: center; padding-top: 20px;'> <span class='card-title' style = 'font-size: 25px;'> <b>" + myProf.name + "</b> </span>\
+	 </div> <span class = 'numRatings' style = 'font-size: 15px;'>" + myProf.numRatings+ "</span>\
 	  <br> <br> <span id = 'qualityLabel' style = 'font-size: 15px;'> <b> Overall Quality </b> </span>\
-	  <br> <span id = 'ratings' style = 'font-size: 15px;'>" + rating + "</span> <br> <br> <span id = 'takeAgainLabel'\
+	  <br> <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.rating + "</span> <br> <br> <span id = 'takeAgainLabel'\
 	  style = 'font-size: 15px;'> <b> Would take again </b> </span> <br> <span id = 'ratings' style = 'font-size: 15px;'>"
-	  + takeAgain + "</span> <br> <br> <span id = 'difficultyLabel' style = 'font-size: 15px;'> <b> Difficulty </b> </span> <br>\
-	  <span id = 'ratings' style = 'font-size: 15px;'>" + difficulty + "</span> <br> <br> <span class = 'chili'>"
+	  + myProf.repeat + "</span> <br> <br> <span id = 'difficultyLabel' style = 'font-size: 15px;'> <b> Difficulty </b> </span> <br>\
+	  <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.difficulty + "</span> <br> <br> <span class = 'chili'>"
 	  card.getElementsByClassName("chili")[0].appendChild(image); "</span> </div> </div>";
 
     //profNameParent is wrapper
@@ -219,6 +278,9 @@ function cleanProfName(profName){
 	var profCleaning = profName.slice(43, -24);
 
 	if(profCleaning == "To Be Assigned"){
+		//console.log("fucking to be assigned");
+		profSplit = "To Be Assigned";
+		return profSplit;
 	}
 
 	//cleaning name to look normal
@@ -227,6 +289,7 @@ function cleanProfName(profName){
 		profSplit = profCleaning.split(",")
 		//profCleaned = profCleaning[0] + " " + profCleaning[1];
 		//return profCleaned;
+		//console.log('ProfSplit: '+ profSplit);
 		return profSplit;
 		//console.log("profCleaned: " + profCleaned);
 	}	
