@@ -1,6 +1,3 @@
-
-// professors [ "Hoover H", "Pilarski Patrick", "Wong Kenny"], cause problems. Dont exist/nicknames
-
 window.onload = function () {
 
  	var frame = document.getElementsByName("TargetContent")[0];
@@ -15,7 +12,6 @@ window.onload = function () {
 		try{
 			if ("Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 0){
 				count = 1;
-				//console.log("Class Search Results");
 				grabProfNames(frameDoc)
 			}
 			else if ("Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 1){
@@ -28,7 +24,6 @@ window.onload = function () {
 
 	}, false);
 };
-
 
 //constructor for professors.
 var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatings, url){
@@ -59,10 +54,7 @@ function grabProfNames(frameDoc){
 		
 		cleanProfName(profName)
 		profCleanedName = profSplit;
-		console.log(profCleanedName);
-
-
-
+	
 		if(profCleanedName == "To Be Assigned"){
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
@@ -70,9 +62,6 @@ function grabProfNames(frameDoc){
 		}
 
 		else{
-			//profCleaned = profCleanedName[0] + " " + profCleanedName[1];
-			console.log("prof last-first: " + profCleanedName[0] + " " + profCleanedName[1]);
-
 			for(var key in profDic){
 				if(key == profCleanedName[0] + " " + profCleanedName[1]){
 					profCleanedName = profDic[key];
@@ -98,7 +87,6 @@ function getProfURL(profCleanedName, frameDoc, id){
 	}, function (response){
 		var div = document.createElement("div");
 		div.innerHTML = response;
-		//console.log(response);
 
 		//try if professor exists on RMP
 		try{
@@ -128,10 +116,6 @@ function getProfURL(profCleanedName, frameDoc, id){
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, profurl);
 			injectRating(frameDoc, id, myProf, 0)
 		}
-		// profurl = div.getElementsByClassName('listing PROFESSOR')[0].children[0].href;
-		// profurl = profurl.slice(profurl.indexOf("/ShowRatings"), profurl.length);
-		// profurl = "http://www.ratemyprofessors.com" + profurl;
-		// getRating(profurl, profCleanedName, frameDoc, id)
 	});
 }
 
@@ -144,8 +128,6 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 	}, function (response) {
 		var div = document.createElement('div');
 		div.innerHTML = response;
-		// console.log("URL for the list of profs: " + profurl);
-		// console.log("Name: " + profCleanedName[1] + " " + profCleanedName[0]);
 		var rating;
 		var name;
 		var takeAgain;
@@ -153,8 +135,7 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 		var difficulty;
 		var numRatings;
 		var professorURL;
-		if(!isNaN(div.getElementsByClassName('grade')[0].innerHTML))
-		{
+		try{
 			rating  = (div.getElementsByClassName('grade')[0].innerHTML);
 			name = div.getElementsByClassName("pfname")[0].innerHTML + " " + div.getElementsByClassName("plname")[0].innerHTML;
 			takeAgain = (div.getElementsByClassName("grade")[1].innerHTML).trim();
@@ -165,9 +146,10 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 			professorURL = profurl
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
+			injectRating(frameDoc, id, myProf, display);
 		}
 
-		else{
+		catch(TypeError){
 			rating = "N/A";
 			name = profCleanedName[1] + " " + profCleanedName[0];
 			takeAgain = "N/A";
@@ -177,10 +159,8 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 			professorURL = profurl;
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
+			injectRating(frameDoc, id, myProf, display);
 		}
-		
-		//console.log(profCleanedName[0] + " " + profCleanedName[1] + " url: " + myProf.url + " rating: " + rating);
-		injectRating(frameDoc, id, myProf, display);
 	});
 }
 
@@ -293,7 +273,6 @@ function cleanProfName(profName){
 	//cleaning name to look normal
 	else{
 		profSplit = profCleaning.split(",")
-		console.log(typeof(profSplit));
 		return profSplit;
 	}	
 }
