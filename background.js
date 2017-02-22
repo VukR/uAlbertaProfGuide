@@ -1,12 +1,9 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse){
-	// if (request.greeting == "hello"){
-	// 	sendResponse({
-	// 		farewell: "goodbye"
-	// 	});
-	// }
-	//console.log("message received by background")
 
-	//
+/*https://developer.chrome.com/extensions/xhr#extension-origin
+https://developer.chrome.com/extensions/runtime#event-onMessage
+https://developer.chrome.com/extensions/runtime#method-sendMessage*/
+
 	if(request.action == "xhttp"){
 		var xhttp = new XMLHttpRequest();
 		xhttp.onload = function(){
