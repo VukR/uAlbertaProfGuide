@@ -1,5 +1,3 @@
-//content scripts run in the context of web pages. Reads details of web pages and browsers it visits or make changes.
-
 {
 	"manifest_version": 2,
 	"name": "uAlbertaRMP",
@@ -8,12 +6,8 @@
 
 	"content_scripts": [
 		{
-			//"matches": ["https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/*"],
 			"matches": ["https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.CLASS_*"],
-			"js": ["jquery-3.1.1.min.js", "content.js"],
-			"css": ["extra.css"]
-			//"css": ["content.css"]
-			// "html": ["content.html"]
+			"js": ["content.js"]
 		}
 	],
 
@@ -30,9 +24,3 @@
 		"Assets/*.png"
 	]
 }
-
-//main page, search page, class schedule
-
-// https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/ZSS_STUDENT_CENTER.ZSS_BT_HOMEPAGE.GBL
-// https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?pslnkid=ZSS_HC_CLASS_SEARCH&FolderPath=PORTAL_ROOT_OBJECT.ZSS_ACADEMICS.ZSS_AC_SEARCH.ZSS_HC_CLASS_SEARCH&IsFolder=false&IgnoreParamTempl=FolderPath%2cIsFolder
-// https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_LIST.GBL?pslnkid=ZSS_HC_SSR_SSENRL_LIST&FolderPath=PORTAL_ROOT_OBJECT.ZSS_ACADEMICS.ZSS_AC_ENROLL.ZSS_HC_SSR_SSENRL_LIST&IsFolder=false&IgnoreParamTempl=FolderPath%2cIsFolder

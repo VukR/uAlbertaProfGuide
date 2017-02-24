@@ -1,3 +1,8 @@
+
+
+
+/*include agustana campus reviews. 
+Anthony Koleoso, Michael Roberts, Shahid Azam reviews from different schools add them ?*/
 window.onload = function () {
 
  	var frame = document.getElementsByName("TargetContent")[0];
@@ -25,7 +30,39 @@ window.onload = function () {
 	}, false);
 };
 
-//constructor for professors.
+//dictionary of all profs scraped from beartracks corresponding to their nicknames on RMP
+var profDic = {"You Jia-Huai": ["Jia", "You"], "Hoover H": ["Jim", "Hoover"], "Wong Kenny": ["Wong", "Ken"], "Greiner Russell":
+["Russ", "Greiner"], "Kondrak Grzegorz": ["Greg", "Kondrak"], "Stringer Patricia": ["Trish", "Stringer"], "Ives John": 
+["Jack", "Ives"], "Willoughby Pamela": ["Pam", "Willoughby"], "Vinebrooke Rolfe": ["Rolf", "Vinebrooke"], "Sanders Ralph Sean":
+["Sean", "Sanders"], "Choi Phillip": ["Choi", "Philip"], "West Frederick": ["West", "Fred"], "Bremault-Phillips Suzette":
+["Suzette", "Phillips"], "Qiu Zhi-Jun": ["Tony", "Qiu"], "Al-Hussein Mohamed": ["Mohammed", "Al-Husein"], "Haagsma Margriet":
+["Margariet", "Haagsma"], "Khadem Seyed Amir": ["Amir", "Khadem"], "Yang Herbert": ["Herb", "Yang"], "Clark Frederick":
+["Fred", "Clark"], "Pemberton Stuart": ["George", "Pemberton"], "Chacko Thomas": ["Tom", "Chacko"], "Sanchez-Azofeifa Gerardo": 
+["Arturo", "Sanchez-Azofeifa"], "Ambury Bradley": ["Brad", "Ambury"], "Szostak Richard": ["Rick", "Szostak"],
+"Young Catherine Denise": ["Denise", "Young"], "Parsons James": ["Jim", "Parsons"], "Iveson Margaret": ["Marg", "Iveson"],
+"Kuropatwa Riki": ["Rikki", "Kuropatwa"], "McFeetors P Janelle": ["McFeetors", "Janelle"], "Kula Beverley": ["Bev", "Kula"],
+"Gleddie Douglas": ["Doug", "Gleddie"], "Shultz Lynette": ["Lynette", "Schultz"], "Kachur Jerrold": ["Jerry", "Kachur"],
+"Georgiou Georgios": ["George", "Georgiou"], "Evoy Stephane": ["Evoy", "Stephan"], "Elezzabi Abdulhakem": ["Abdul", "Elezzabi"],
+"Decorby Raymond": ["Ray", "Decorby"], "Khajehoddin Sayed Ali": ["Ali", "Khajehoddin"], "Zuo Mingjian": ["Ming", "Zuo"],
+"Perkins Lorimer Donald": ["Don", "Perkins"], "Savard Valérie": ["Savard", "Valerie"], "Pinterics Jocelyne":
+["Natasha", "Pinterics"], "Kosman Marcel": ["Marcelle", "Kosman"], "Lemieux Hélène": ["Lemieux", "Helene"], "Boisvert Natalie":
+["Nathalie", "Boisvert"], "Okeke-Ihejirika Philomina": ["Philomena", "Okeke"], "Di Cara Francesca": ["Francesca", "Dicara"],
+"Schmitt Douglas": ["Doug", "Schmitt"], "Blunck Ute-Brigitte": ["Ute", "Blunck-Devique"], "McDougall E Ann": ["Ann", "McDougall"],
+"Chandler Kathryn": ["Katherine", "Chandler"], "Magor Katharine": ["Kathy", "Magor"], "Yahya Moinuddin": ["Moin", "Yahya"],
+"Arppe Antti Veikko Gabriel": ["Antti", "Arppe"], "Arnhold Anja-Helene": ["Anja", "Arnhold"], "Davis Vincent": ["Vince", "Davis"],
+"Swaffield James": ["Jim", "Swaffield"], "Prus-Czarnecki Andrzej": ["Andrzej", "Czarnecki"], "Peschke Georg": ["George", "Peschke"]
+,"Jar Pean-Yue": ["Ben", "Jar"], "Secanell Gallart Marc": ["Marc", "Secanell"], "Joseph Timothy": ["Tim", "Joseph"],
+"Dempsey Lloyd": ["James", "Dempsey"], "Pollard Loreen": ["Lori", "Pollard"], "Gooley Alison": ["Allison", "Gooley"],
+"Tse Frederick": ["Fred", "Tse"], "Masoud Seyed Hassan": ["Hassan", "Masoud"], "Corkum Philip": ["Phil", "Corkum"],
+"Wilson Robert": ["Rob", "Wilson"], "Pogosian Dmitry": ["Dimitryi", "Pogosyan"], "Church W. John": ["John", "Church"],
+"Aitken Robert": ["Rob", "Aitken"], "Beurki Beukian Sevan": ["Sevan", "Beukian"], "Lightbody James": ["Jim", "Lightbody"],
+"Vargas Lascano Dayuma Ixchel": ["Dayuma", "Lascano"], "Noels Kimberly": ["Kim", "Noels"], "Masuda Takahiko":
+ ["Taka", "Masuda"], "Colbourne Frederick": ["Fred", "Colbourne"], "Baerveldt Jacobus": ["Cor", "Baerveldt"],
+"Kuiken Donald": ["Don", "Kuiken"], "Singhal Anthony": ["Tony", "Singhal"], "Kang Parmjit Kaur": ["Parmjit", "Kang"],
+"BayatRizi Zohreh": ["Zohreh", "Bayatrizi"], "Bortolussi Dixon Marisa": ["Marisa", "Bortolussi"], "Brick Frederick":
+["Rick", "Brick"], "Briggs Anthony": ["Tony", "Briggs"], "Bell Mary": ["Mebbie", "Bell"], "Bechtel Gregory": ["Greg", "Bechtel"]};
+
+//constructor for professors information.
 var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatings, url){
 	this.name = name;
 	this.rating = rating;
@@ -36,31 +73,31 @@ var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatin
 	this.url = url;
 }
 
+//grabs all from names from beartracks 
 function grabProfNames(frameDoc){
 
-	//Don't exist on rmp Karim Ali, Pimental Demian, Nadi Sarah, Pilarski Patrick,
-	var profDic = {"You Jia-Huai": ["Jia", "You"], "Hoover H": ["Jim", "Hoover"], "Wong Kenny": ["Wong", "Ken"], "Greiner Russell":
-["Russ", "Greiner"], "Kondrak Grzegorz": ["Greg", "Kondrak"]};
 	var profIndex = 0;	
 	var profCleanedName;
-	//var profCleaned;
-	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex; //id of element containing prof name
+	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex; //id of element containing professor names on beartracks
 	var profNameParent = frameDoc.getElementById(id);
 	
+	//loops until it runs out of professor names to scrape
 	while (profNameParent != null){
 
-		//finding text of child from parent profName
+		//finding html text of professor name
 		var profName = profNameParent.getElementsByTagName("div")[0].innerHTML;
 		
 		cleanProfName(profName)
 		profCleanedName = profSplit;
 	
+		//continue to next id if professor has not been assigned
 		if(profCleanedName == "To Be Assigned"){
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
 			profNameParent = frameDoc.getElementById(id);
 		}
 
+		//check to see if professor has a nickname, then get URL from RMP and continue to next id
 		else{
 			for(var key in profDic){
 				if(key == profCleanedName[0] + " " + profCleanedName[1]){
@@ -77,11 +114,15 @@ function grabProfNames(frameDoc){
 	}
 }
 
+/*RMP displays professors page with a special index that they create. 
+To get around not knowing the special index, we first get search results of that prof for university alberta
+using RMP search for prof option */ 
 function getProfURL(profCleanedName, frameDoc, id){
 	
 	chrome.runtime.sendMessage({
 		method: "POST",
 		action: "xhttp",
+		//url of RMP search results for that professor
 		url: "https://www.ratemyprofessors.com/search.jsp?query=university+of+alberta+" + profCleanedName[0] + "+" + profCleanedName[1],
 		data: ""
 	}, function (response){
@@ -119,6 +160,7 @@ function getProfURL(profCleanedName, frameDoc, id){
 	});
 }
 
+//Professor existed, so scrape desired information.
 function getRating(profurl, profCleanedName, frameDoc, id, display){
 	chrome.runtime.sendMessage({
 		method: 'POST',
@@ -135,6 +177,8 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 		var difficulty;
 		var numRatings;
 		var professorURL;
+
+		//professors review exist
 		try{
 			rating  = (div.getElementsByClassName('grade')[0].innerHTML);
 			name = div.getElementsByClassName("pfname")[0].innerHTML + " " + div.getElementsByClassName("plname")[0].innerHTML;
@@ -149,6 +193,7 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 			injectRating(frameDoc, id, myProf, display);
 		}
 
+		//professors reviews don't exist, but professor page exists
 		catch(TypeError){
 			rating = "N/A";
 			name = profCleanedName[1] + " " + profCleanedName[0];
@@ -164,11 +209,16 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 	});
 }
 
+/*Displaying links to proper RMP pages along with the profs rating and corresponding rating color
+onto beartracks*/
 function injectRating(frameDoc, id, myProf, display){
 	var profNameParent = frameDoc.getElementById(id);
 
+
+	//link to RMP page
 	profNameParent.getElementsByTagName("div")[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
 
+	//professor has info to display
 	if(display == 1){
 		if(myProf.rating < 2.5){
 			profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#ff0000"; // red = bad FF4136
@@ -185,18 +235,21 @@ function injectRating(frameDoc, id, myProf, display){
 		addToolTip(profNameParent, myProf, display)
 	}
 
+	//professor has no info to dsplay
 	else{
-		//profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#ffff00";
 		addToolTip(profNameParent, myProf, display)
 	}
 	
 }
 
+/*displaying all the professors scraped info into a tooltip that appears when hovered over
+a professors name*/
 function addToolTip(profNameParent, myProf, display){
 	var card = document.createElement("div");
 	card.setAttribute("class", "cardContainer");
 	var image = document.createElement("img");
 	
+	//professor has information to display
 	if(display == 1){
 
 		image.setAttribute("width", "139px");
@@ -208,23 +261,26 @@ function addToolTip(profNameParent, myProf, display){
 		}
 
 		card.innerHTML = "<div class='card'> <div class='card-content' style = 'text-align: center;'> <div class = 'title'\
-		 style = 'text-align: center; padding-top: 20px;'> <span class='card-title' style = 'font-size: 25px;'> <b>" + myProf.name + "</b> </span>\
+		 style = 'text-align: center; padding-top: 10px;'> <span class='card-title' style = 'font-size: 25px;'> <b>" + myProf.name + "</b> </span>\
 		 </div> <span class = 'numRatings' style = 'font-size: 15px;'>" + myProf.numRatings+ "</span>\
 		  <br> <br> <span id = 'qualityLabel' style = 'font-size: 15px;'> <b> Overall Quality </b> </span>\
 		  <br> <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.rating + "</span> <br> <br> <span id = 'takeAgainLabel'\
 		  style = 'font-size: 15px;'> <b> Would take again </b> </span> <br> <span id = 'ratings' style = 'font-size: 15px;'>"
 		  + myProf.repeat + "</span> <br> <br> <span id = 'difficultyLabel' style = 'font-size: 15px;'> <b> Difficulty </b> </span> <br>\
-		  <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.difficulty + "</span> <br> <br> <span class = 'chili'>"
+		  <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.difficulty + "</span> <br> <br> <br> <span class = 'chili'>"
 		  card.getElementsByClassName("chili")[0].appendChild(image); "</span> </div> </div>";
 	}
 
+	//no information to display
 	else{
+		image.setAttribute("height", "200px");
 		image.src = chrome.extension.getURL("Assets/404.png");
-		card.innerHTML = "<div class='card'> <div class='card-content' style = 'text-align: center;'>  <div class = 'title'\
-	 style = 'text-align: center; padding-top: 20px;'> <span class='card-title' style = 'font-size: 25px;'> <b>" + myProf.name + 
-	 "</b> </span> </div> <span id = 'noProf' style = 'font-size: 15px;'>" + myProf.name + " seems to be missing from <br> the\
-	 RateMyProfessor pages, <br> please add them <br> and review them on RateMyProfessor</span> <span class = 'chili'>"
-		  card.getElementsByClassName("chili")[0].appendChild(image); "</span> </div> </div>";
+		card.innerHTML = "<div class='card' style = 'text-align: center; padding-top: 10px;'> <div class='card-content'>\
+		 <span class='card-title' style = 'font-size: 25px; font-weight: bold;'>" + myProf.name + " <br> </span>\
+		  <span id = 'noProf' style = 'font-size: 15px;'>" + myProf.name + " seems to be missing from the RateMyProfessor pages,\
+		   please add and review them </span> </div> </div>"
+		  card.getElementsByClassName("card")[0].appendChild(image); 
+
 	}
 
     //profNameParent is wrapper	
@@ -233,6 +289,7 @@ function addToolTip(profNameParent, myProf, display){
     var cardContainer = profNameParent.closest(".PSLEVEL3GRIDROW").getElementsByClassName('cardContainer')[0];
     cardContainer.style.display = 'none';
 
+    //tooltip pop up with all required infromation
     profNameParent.addEventListener("mouseover", function() {
     	
 			card.style.display = 'block';
@@ -251,6 +308,7 @@ function addToolTip(profNameParent, myProf, display){
 				card.style.display = 'none';
     });
 
+    //keeps tooltip displayed when it is moused over
     card.addEventListener("mouseover", function() {
     	card.style.display = 'block';
     });
@@ -260,7 +318,9 @@ function addToolTip(profNameParent, myProf, display){
     });
 }
 
+//removes excess html from profs name
 function cleanProfName(profName){
+
 	//get rid of excess html
 	var profCleaning = profName.slice(43, -24);
 
@@ -270,7 +330,7 @@ function cleanProfName(profName){
 		return profSplit;
 	}
 
-	//cleaning name to look normal
+	//return an array of last name, first name for easy manipulation later
 	else{
 		profSplit = profCleaning.split(",")
 		return profSplit;
