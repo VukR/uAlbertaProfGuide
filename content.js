@@ -73,6 +73,31 @@ var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatin
 	this.url = url;
 }
 
+
+function requestSchedule(frameDoc, link){
+	chrome.runtime.sendMessage({
+		method: "POST",
+		action: "schedule",
+		//url of RMP search results for that professor
+		url: "https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link, 
+		data: ""
+	}, function (response){
+		//console.log(response);
+		console.log("https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link);
+		var div = document.createElement("div");
+		div.innerHTML = response;
+		//console.log(div);
+		displaySchedule(frameDoc, div)
+		
+	});
+}
+
+function displaySchedule(frameDoc, div){
+	//console.log(div);
+	frameDoc.body.appendChild(div);
+
+}
+
 //grabs all from names from beartracks 
 function grabProfNames(frameDoc){
 
@@ -80,6 +105,20 @@ function grabProfNames(frameDoc){
 	var profCleanedName;
 	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex; //id of element containing professor names on beartracks
 	var profNameParent = frameDoc.getElementById(id);
+
+	var link = frameDoc.getElementsByClassName("ZSS_VARIABLE_MSG")[0].innerHTML;
+
+	//remove extra characters
+	link = link.slice(63, -78);
+	//remove un needed string in links, otherwise reaches incorrect page
+	link = link.replace("amp;", "");
+	link = link.replace("amp;", "");
+	console.log(link);
+	if(link.includes("SA_LEARNER_SERVICES_")){
+		console.log("Contains link");
+		requestSchedule(frameDoc, link)
+	}
+	//console.log(link);
 	
 	//loops until it runs out of professor names to scrape
 	while (profNameParent != null){
