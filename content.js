@@ -76,11 +76,11 @@ var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatin
 
 function requestSchedule(frameDoc, link){
 	chrome.runtime.sendMessage({
-		method: "POST",
+		method: "GET",
 		action: "schedule",
 		//url of RMP search results for that professor
 		url: "https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link, 
-		data: ""
+		//data: ""
 	}, function (response){
 		//console.log(response);
 		console.log("https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link);
