@@ -7,7 +7,9 @@
 	"content_scripts": [
 		{
 			"matches": ["https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.CLASS_*"],
-			"js": ["content.js"]
+			"js": [
+				"content.js",
+				"other.js"]
 		}
 	],
 

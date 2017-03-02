@@ -14,7 +14,8 @@ https://developer.chrome.com/extensions/runtime#method-sendMessage*/
 			sendResponse(response);
 		};
 
-		//specifies request, url is a file on the server
+		//specifies request
+		//url is a file on the server
 		xhttp.open(request.method, request.url, true);
 		
 		//send request to server
@@ -24,10 +25,6 @@ https://developer.chrome.com/extensions/runtime#method-sendMessage*/
 
 	else if(request.action == "schedule"){
 		var xhttp = new XMLHttpRequest();
-
-		// setTimout(continue(), 1000);
-		// function continue(){
-		// }
 
 		xhttp.onload = function(){
 			var response = xhttp.responseText;

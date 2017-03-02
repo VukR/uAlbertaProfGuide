@@ -86,6 +86,7 @@ function requestSchedule(frameDoc, link){
 		console.log("https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link);
 		var div = document.createElement("div");
 		div.innerHTML = response;
+		
 		//console.log(div);
 		displaySchedule(frameDoc, div)
 		
@@ -95,6 +96,10 @@ function requestSchedule(frameDoc, link){
 function displaySchedule(frameDoc, div){
 	//console.log(div);
 	frameDoc.body.appendChild(div);
+	var s = document.createElement("script");
+	s.src = chrome.extension.getURL("other.js");
+	s.async = false;
+	frameDoc.body.appendChild(s);
 
 }
 
