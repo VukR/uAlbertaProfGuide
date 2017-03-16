@@ -25,7 +25,7 @@ window.onload = function () {
 	}, false);
 };
 
-//dictionary of all profs scraped from beartracks corresponding to their nicknames on RMP
+//dictionary of all profs with nicknames/different names on RMP
 var profDic = {"You Jia-Huai": ["Jia", "You"], "Hoover H": ["Jim", "Hoover"], "Wong Kenny": ["Wong", "Ken"], "Greiner Russell":
 ["Russ", "Greiner"], "Kondrak Grzegorz": ["Greg", "Kondrak"], "Stringer Patricia": ["Trish", "Stringer"], "Ives John": 
 ["Jack", "Ives"], "Willoughby Pamela": ["Pam", "Willoughby"], "Vinebrooke Rolfe": ["Rolf", "Vinebrooke"], "Sanders Ralph Sean":
@@ -80,7 +80,7 @@ function grabProfNames(frameDoc){
 
 		//finding html text of professor name
 		var profName = profNameParent.getElementsByTagName("div")[0].innerHTML;
-		
+		var multiProf = profName.includes("<td");
 		cleanProfName(profName)
 		profCleanedName = profSplit;
 	
@@ -89,8 +89,37 @@ function grabProfNames(frameDoc){
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
 			profNameParent = frameDoc.getElementById(id);
-		}
+		} 
 
+		else if (multiProf) {
+			console.log(multiProf);
+			multiProfTable = profNameParent.children[0].children[0];
+			console.log(multiProfTable);
+			console.log("table length: " + multiProfTable.rows.length);
+
+			for(var i = 0; i < multiProfTable.rows.length; i++){
+				multiProfName = multiProfTable.rows[i].cells[0].children[0].innerHTML;
+				console.log("ProfName: " + multiProfName);
+				console.log("ProfName: " + multiProfName.length);
+
+				multiProfClean = multiProfName.split(",")
+				console.log(multiProfClean);
+
+				for(var key in profDic){
+					if(key == multiProfClean[0] + " " + multiProfClean[1]){
+						multiProfClean = profDic[key];
+						break;
+					}
+				}
+
+				console.log("Name: " + multiProfClean + " row: " + multiProfTable.rows[i].cells[0]);
+				getProfURL(multiProfClean, multiProfTable.rows[i], id, 1)
+			}
+
+			profIndex += 1;
+			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
+			profNameParent = frameDoc.getElementById(id);
+		}
 		//check to see if professor has a nickname, then get URL from RMP and continue to next id
 		else{
 			for(var key in profDic){
@@ -100,7 +129,8 @@ function grabProfNames(frameDoc){
 				}
 			}
 
-			getProfURL(profCleanedName, frameDoc, id)
+			console.log("frameDoc: " + frameDoc);
+			getProfURL(profCleanedName, frameDoc, id, 0)
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
 			profNameParent = frameDoc.getElementById(id);
@@ -111,7 +141,11 @@ function grabProfNames(frameDoc){
 /*RMP displays professors page with a special index that they create. 
 To get around not knowing the special index, we first get search results of that prof for university alberta
 using RMP search for prof option, then find professo */ 
-function getProfURL(profCleanedName, frameDoc, id){
+function getProfURL(profCleanedName, frameDoc, id, multiFlag){
+
+	if(multiFlag == 1){
+		console.log("Name in getProfURL: " + frameDoc.cells[0].children[0].innerHTML);
+	}
 	
 	chrome.runtime.sendMessage({
 		method: "POST",
@@ -128,7 +162,11 @@ function getProfURL(profCleanedName, frameDoc, id){
 			profurl = div.getElementsByClassName('listing PROFESSOR')[0].children[0].href;
 			profurl = profurl.slice(profurl.indexOf("/ShowRatings"), profurl.length);
 			profurl = "http://www.ratemyprofessors.com" + profurl;
-			getRating(profurl, profCleanedName, frameDoc, id, 1)
+
+			// if(multiFlag == 1){
+			// 	console.log("Name in getProfURL end: " + frameDoc.cells[0].children[0].innerHTML);
+			// }
+			getRating(profurl, profCleanedName, frameDoc, id, 1, multiFlag)
 		}
 
 		//prof doesnt exist, need to change display on beartracks
@@ -149,13 +187,18 @@ function getProfURL(profCleanedName, frameDoc, id){
 			numRatings = "";
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, profurl);
-			injectRating(frameDoc, id, myProf, 0)
+			injectRating(frameDoc, id, myProf, 0, multiFlag)
 		}
 	});
 }
 
 //Professor existed, so scrape desired information.
-function getRating(profurl, profCleanedName, frameDoc, id, display){
+function getRating(profurl, profCleanedName, frameDoc, id, display, multiFlag){
+
+	if(multiFlag == 1){
+		console.log("Name in getRating: " + frameDoc.cells[0].children[0].innerHTML);
+	}
+
 	chrome.runtime.sendMessage({
 		method: 'POST',
 		action: 'xhttp',
@@ -184,7 +227,7 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 			professorURL = profurl
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
-			injectRating(frameDoc, id, myProf, display);
+			injectRating(frameDoc, id, myProf, display, multiFlag);
 		}
 
 		//professors reviews don't exist, but professor page exists
@@ -198,40 +241,66 @@ function getRating(profurl, profCleanedName, frameDoc, id, display){
 			professorURL = profurl;
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
-			injectRating(frameDoc, id, myProf, display);
+			injectRating(frameDoc, id, myProf, display, multiFlag);
 		}
 	});
 }
 
 /*Displaying links to proper RMP pages along with the profs rating and corresponding rating color
 onto beartracks*/
-function injectRating(frameDoc, id, myProf, display){
-	var profNameParent = frameDoc.getElementById(id);
+function injectRating(frameDoc, id, myProf, display, multiFlag){
 
-
+	if(multiFlag == 0){
+		var profNameParent = frameDoc.getElementById(id);
 	//link to RMP page
-	profNameParent.getElementsByTagName("div")[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
+		profNameParent.getElementsByTagName("div")[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + profNameParent.getElementsByTagName("div")[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
 
-	//professor has info to display
-	if(display == 1){
-		if(myProf.rating < 2.5){
-			profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#ff0000"; // red = bad FF4136
+		//professor has info to display
+		if(display == 1){
+			if(myProf.rating < 2.5){
+				profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#ff0000"; // red = bad FF4136
+			}
+
+			else if (myProf.rating >= 2.5 && myProf.rating < 3.5 ){
+				profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#FFBF00"; // orange = okay FF851B
+			}
+
+			else if (myProf.rating >= 3.5 && myProf.rating <= 5 ){
+				profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
+			}
+
+			addToolTip(profNameParent, myProf, display)
 		}
 
-		else if (myProf.rating >= 2.5 && myProf.rating < 3.5 ){
-			profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#FFBF00"; // orange = okay FF851B
+		//professor has no info to dsplay
+		else{
+			addToolTip(profNameParent, myProf, display)
 		}
-
-		else if (myProf.rating >= 3.5 && myProf.rating <= 5 ){
-			profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
-		}
-
-		addToolTip(profNameParent, myProf, display)
 	}
 
-	//professor has no info to dsplay
 	else{
-		addToolTip(profNameParent, myProf, display)
+		console.log("Name in injection2: " + frameDoc.cells[0].children[0].innerHTML);
+		frameDoc.cells[0].children[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + frameDoc.cells[0].children[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
+		if(display == 1){
+			if(myProf.rating < 2.5){
+				frameDoc.style.backgroundColor = "#ff0000"; // red = bad FF4136
+			}
+
+			else if (myProf.rating >= 2.5 && myProf.rating < 3.5 ){
+				frameDoc.style.backgroundColor = "#FFBF00"; // orange = okay FF851B
+			}
+
+			else if (myProf.rating >= 3.5 && myProf.rating <= 5 ){
+				frameDoc.style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
+			}
+
+			//addToolTip(profNameParent, myProf, display)
+		}
+
+		//professor has no info to dsplay
+		else{
+			//addToolTip(profNameParent, myProf, display)
+		}
 	}
 	
 }
