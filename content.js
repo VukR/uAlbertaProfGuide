@@ -91,9 +91,11 @@ function grabProfNames(frameDoc){
 			profNameParent = frameDoc.getElementById(id);
 		} 
 
+		//if there are multipls instructors for a course
 		else if (multiProf) {
 			multiProfTable = profNameParent.children[0].children[0];
 
+			//loop through each prof
 			for(var i = 0; i < multiProfTable.rows.length; i++){
 				multiProfName = multiProfTable.rows[i].cells[0].children[0].innerHTML;
 				multiProfClean = multiProfName.split(",")
