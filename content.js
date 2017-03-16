@@ -92,18 +92,11 @@ function grabProfNames(frameDoc){
 		} 
 
 		else if (multiProf) {
-			console.log(multiProf);
 			multiProfTable = profNameParent.children[0].children[0];
-			console.log(multiProfTable);
-			console.log("table length: " + multiProfTable.rows.length);
 
 			for(var i = 0; i < multiProfTable.rows.length; i++){
 				multiProfName = multiProfTable.rows[i].cells[0].children[0].innerHTML;
-				console.log("ProfName: " + multiProfName);
-				console.log("ProfName: " + multiProfName.length);
-
 				multiProfClean = multiProfName.split(",")
-				console.log(multiProfClean);
 
 				for(var key in profDic){
 					if(key == multiProfClean[0] + " " + multiProfClean[1]){
@@ -112,7 +105,6 @@ function grabProfNames(frameDoc){
 					}
 				}
 
-				console.log("Name: " + multiProfClean + " row: " + multiProfTable.rows[i].cells[0]);
 				getProfURL(multiProfClean, multiProfTable.rows[i], id, 1)
 			}
 
@@ -129,7 +121,6 @@ function grabProfNames(frameDoc){
 				}
 			}
 
-			console.log("frameDoc: " + frameDoc);
 			getProfURL(profCleanedName, frameDoc, id, 0)
 			profIndex += 1;
 			id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex;
@@ -142,10 +133,6 @@ function grabProfNames(frameDoc){
 To get around not knowing the special index, we first get search results of that prof for university alberta
 using RMP search for prof option, then find professo */ 
 function getProfURL(profCleanedName, frameDoc, id, multiFlag){
-
-	if(multiFlag == 1){
-		console.log("Name in getProfURL: " + frameDoc.cells[0].children[0].innerHTML);
-	}
 	
 	chrome.runtime.sendMessage({
 		method: "POST",
@@ -163,9 +150,6 @@ function getProfURL(profCleanedName, frameDoc, id, multiFlag){
 			profurl = profurl.slice(profurl.indexOf("/ShowRatings"), profurl.length);
 			profurl = "http://www.ratemyprofessors.com" + profurl;
 
-			// if(multiFlag == 1){
-			// 	console.log("Name in getProfURL end: " + frameDoc.cells[0].children[0].innerHTML);
-			// }
 			getRating(profurl, profCleanedName, frameDoc, id, 1, multiFlag)
 		}
 
@@ -187,6 +171,7 @@ function getProfURL(profCleanedName, frameDoc, id, multiFlag){
 			numRatings = "";
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, profurl);
+	
 			injectRating(frameDoc, id, myProf, 0, multiFlag)
 		}
 	});
@@ -194,10 +179,6 @@ function getProfURL(profCleanedName, frameDoc, id, multiFlag){
 
 //Professor existed, so scrape desired information.
 function getRating(profurl, profCleanedName, frameDoc, id, display, multiFlag){
-
-	if(multiFlag == 1){
-		console.log("Name in getRating: " + frameDoc.cells[0].children[0].innerHTML);
-	}
 
 	chrome.runtime.sendMessage({
 		method: 'POST',
@@ -227,6 +208,7 @@ function getRating(profurl, profCleanedName, frameDoc, id, display, multiFlag){
 			professorURL = profurl
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
+			
 			injectRating(frameDoc, id, myProf, display, multiFlag);
 		}
 
@@ -241,6 +223,7 @@ function getRating(profurl, profCleanedName, frameDoc, id, display, multiFlag){
 			professorURL = profurl;
 
 			var myProf = new Professor(name, rating, takeAgain, difficulty, chiliPepper, numRatings, professorURL);
+
 			injectRating(frameDoc, id, myProf, display, multiFlag);
 		}
 	});
@@ -269,17 +252,16 @@ function injectRating(frameDoc, id, myProf, display, multiFlag){
 				profNameParent.closest(".PSLEVEL3GRIDROW").style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
 			}
 
-			addToolTip(profNameParent, myProf, display)
+			addToolTip(profNameParent, myProf, display, multiFlag)
 		}
 
 		//professor has no info to dsplay
 		else{
-			addToolTip(profNameParent, myProf, display)
+			addToolTip(profNameParent, myProf, display, multiFlag)
 		}
 	}
 
 	else{
-		console.log("Name in injection2: " + frameDoc.cells[0].children[0].innerHTML);
 		frameDoc.cells[0].children[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + frameDoc.cells[0].children[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
 		if(display == 1){
 			if(myProf.rating < 2.5){
@@ -294,12 +276,12 @@ function injectRating(frameDoc, id, myProf, display, multiFlag){
 				frameDoc.style.backgroundColor = "#00ff00"; // green = good 00ff002ECC40
 			}
 
-			//addToolTip(profNameParent, myProf, display)
+			addToolTip(frameDoc, myProf, display, multiFlag)
 		}
 
 		//professor has no info to dsplay
 		else{
-			//addToolTip(profNameParent, myProf, display)
+			addToolTip(frameDoc, myProf, display, multiFlag)
 		}
 	}
 	
@@ -307,7 +289,8 @@ function injectRating(frameDoc, id, myProf, display, multiFlag){
 
 /*displaying all the professors scraped info into a tooltip that appears when hovered over
 a professors name*/
-function addToolTip(profNameParent, myProf, display){
+function addToolTip(profNameParent, myProf, display, multiFlag){
+
 	var card = document.createElement("div");
 	card.setAttribute("class", "cardContainer");
 	var image = document.createElement("img");
@@ -346,41 +329,81 @@ function addToolTip(profNameParent, myProf, display){
 
 	}
 
-    //profNameParent is wrapper	
-    profNameParent.closest(".PSLEVEL3GRIDROW").appendChild(card);
+	if(multiFlag == 0){
+	    //profNameParent is wrapper	
+	    profNameParent.closest(".PSLEVEL3GRIDROW").appendChild(card);
 
-    var cardContainer = profNameParent.closest(".PSLEVEL3GRIDROW").getElementsByClassName('cardContainer')[0];
-    cardContainer.style.display = 'none';
+	    var cardContainer = profNameParent.closest(".PSLEVEL3GRIDROW").getElementsByClassName('cardContainer')[0];
+	    cardContainer.style.display = 'none';
 
-    //tooltip pop up with all required infromation
-    profNameParent.addEventListener("mouseover", function() {
-    	
-			card.style.display = 'block';
-			card.style.backgroundColor = "white";
-			card.style.borderWidth = "medium"
-			card.style.borderColor = "#00431b";
-			card.style.borderStyle = "solid";
-    		card.style.color = "#00431b";
-    		card.style.position = "absolute";
-    		card.style.width = "300px";
-    		card.style.minHeight = "310px";
-    		card.style.paddingLeft = "5px"
-    		card.style.paddingRight = "5px"
+	    //tooltip pop up with all required infromation
+	    profNameParent.addEventListener("mouseover", function() {
+	    	
+				card.style.display = 'block';
+				card.style.backgroundColor = "white";
+				card.style.borderWidth = "medium"
+				card.style.borderColor = "#00431b";
+				card.style.borderStyle = "solid";
+	    		card.style.color = "#00431b";
+	    		card.style.position = "absolute";
+	    		card.style.width = "300px";
+	    		card.style.minHeight = "310px";
+	    		card.style.paddingLeft = "5px"
+	    		card.style.paddingRight = "5px"
 
-    });
-    profNameParent.addEventListener("mouseout", function() {
-    	
-				card.style.display = 'none';
-    });
+	    });
+	    profNameParent.addEventListener("mouseout", function() {
+	    	
+					card.style.display = 'none';
+	    });
 
-    //keeps tooltip displayed when it is moused over
-    card.addEventListener("mouseover", function() {
-    	card.style.display = 'block';
-    });
+	    //keeps tooltip displayed when it is moused over
+	    card.addEventListener("mouseover", function() {
+	    	card.style.display = 'block';
+	    });
 
-    card.addEventListener("mouseout", function() {
-    	card.style.display = 'none';
-    });
+	    card.addEventListener("mouseout", function() {
+	    	card.style.display = 'none';
+	    });
+	}
+
+	else{
+		 profNameParent.cells[0].children[0].appendChild(card);
+
+	    var cardContainer = profNameParent.cells[0].children[0].getElementsByClassName('cardContainer')[0];
+	    cardContainer.style.display = 'none';
+
+	    //tooltip pop up with all required infromation
+	    profNameParent.cells[0].children[0].addEventListener("mouseover", function() {
+	    	
+				card.style.display = 'block';
+				card.style.backgroundColor = "white";
+				card.style.borderWidth = "medium"
+				card.style.borderColor = "#00431b";
+				card.style.borderStyle = "solid";
+	    		card.style.color = "#00431b";
+	    		card.style.position = "absolute";
+	    		card.style.width = "300px";
+	    		card.style.minHeight = "310px";
+	    		card.style.paddingLeft = "5px"
+	    		card.style.paddingRight = "5px"
+
+	    });
+	    profNameParent.cells[0].children[0].addEventListener("mouseout", function() {
+	    	
+					card.style.display = 'none';
+	    });
+
+	    //keeps tooltip displayed when it is moused over
+	    card.addEventListener("mouseover", function() {
+	    	card.style.display = 'block';
+	    });
+
+	    card.addEventListener("mouseout", function() {
+	    	card.style.display = 'none';
+	    });
+
+	}
 }
 
 //removes excess html from profs name
