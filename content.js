@@ -110,7 +110,7 @@ function grabProfNames(frameDoc){
 
 /*RMP displays professors page with a special index that they create. 
 To get around not knowing the special index, we first get search results of that prof for university alberta
-using RMP search for prof option */ 
+using RMP search for prof option, then find professo */ 
 function getProfURL(profCleanedName, frameDoc, id){
 	
 	chrome.runtime.sendMessage({
@@ -255,7 +255,7 @@ function addToolTip(profNameParent, myProf, display){
 		}
 
 		card.innerHTML = "<div class='card'> <div class='card-content' style = 'text-align: center;'> <div class = 'title'\
-		 style = 'text-align: center; padding-top: 10px;'> <span class='card-title' style = 'font-size: 25px;'> <b>" + myProf.name + "</b> </span>\
+		 style = 'text-align: center; padding-top: 10px;'> <span class='card-title' style = 'font-size: 25px; width: 280px; word-wrap: break-word;'> <b>" + myProf.name + "</b> </span>\
 		 </div> <span class = 'numRatings' style = 'font-size: 15px;'>" + myProf.numRatings+ "</span>\
 		  <br> <br> <span id = 'qualityLabel' style = 'font-size: 15px;'> <b> Overall Quality </b> </span>\
 		  <br> <span id = 'ratings' style = 'font-size: 15px;'>" + myProf.rating + "</span> <br> <br> <span id = 'takeAgainLabel'\
@@ -270,13 +270,14 @@ function addToolTip(profNameParent, myProf, display){
 		image.setAttribute("height", "200px");
 		image.src = chrome.extension.getURL("Assets/404.png");
 		card.innerHTML = "<div class='card' style = 'text-align: center; padding-top: 10px;'> <div class='card-content'>\
-		 <span class='card-title' style = 'font-size: 25px; font-weight: bold;'>" + myProf.name + " <br> </span>\
+		 <span class='card-title' style = 'font-size: 25px; font-weight: bold; width: 280px; word-wrap: break-word;'>" + myProf.name + " <br> </span>\
 		  <span id = 'noProf' style = 'font-size: 15px;'>" + myProf.name + " seems to be missing from the RateMyProfessor pages,\
 		   please add and review them </span> </div> </div>"
 		  card.getElementsByClassName("card")[0].appendChild(image); 
 
 	}
 
+    //profNameParent is wrapper	
     profNameParent.closest(".PSLEVEL3GRIDROW").appendChild(card);
 
     var cardContainer = profNameParent.closest(".PSLEVEL3GRIDROW").getElementsByClassName('cardContainer')[0];
@@ -293,7 +294,9 @@ function addToolTip(profNameParent, myProf, display){
     		card.style.color = "#00431b";
     		card.style.position = "absolute";
     		card.style.width = "300px";
-    		card.style.height = "325px";
+    		card.style.minHeight = "310px";
+    		card.style.paddingLeft = "5px"
+    		card.style.paddingRight = "5px"
 
     });
     profNameParent.addEventListener("mouseout", function() {
