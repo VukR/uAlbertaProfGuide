@@ -1,8 +1,3 @@
-
-
-
-/*include agustana campus reviews. 
-Anthony Koleoso, Michael Roberts, Shahid Azam reviews from different schools add them ?*/
 window.onload = function () {
 
  	var frame = document.getElementsByName("TargetContent")[0];
@@ -11,7 +6,7 @@ window.onload = function () {
 
 	/*listen for change in dom, check if it is the Class Search Result
 	have to listen for dom changes because url does not change, but content we need changes on page
-	find better way of listening if possible*/
+	poaaibly find a better way of listening if possible*/
 	frameDoc.addEventListener("DOMSubtreeModified", function(){
 
 		try{
@@ -73,37 +68,7 @@ var Professor = function(name, rating, repeat, difficulty, chiliPepper, numRatin
 	this.url = url;
 }
 
-
-function requestSchedule(frameDoc, link){
-	chrome.runtime.sendMessage({
-		method: "GET",
-		action: "schedule",
-		//url of RMP search results for that professor
-		url: "https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link, 
-		//data: ""
-	}, function (response){
-		//console.log(response);
-		console.log("https://www.beartracks.ualberta.ca/psc/uahebprd/EMPLOYEE/HRMS/c/" + link);
-		var div = document.createElement("div");
-		div.innerHTML = response;
-		
-		//console.log(div);
-		displaySchedule(frameDoc, div)
-		
-	});
-}
-
-function displaySchedule(frameDoc, div){
-	//console.log(div);
-	frameDoc.body.appendChild(div);
-	var s = document.createElement("script");
-	s.src = chrome.extension.getURL("other.js");
-	s.async = false;
-	frameDoc.body.appendChild(s);
-
-}
-
-//grabs all from names from beartracks 
+//Loop through all professors that appear until none are left
 function grabProfNames(frameDoc){
 
 	var profIndex = 0;	
@@ -111,21 +76,6 @@ function grabProfNames(frameDoc){
 	var id = "win0divDERIVED_CLSRCH_SSR_INSTR_LONG$" + profIndex; //id of element containing professor names on beartracks
 	var profNameParent = frameDoc.getElementById(id);
 
-	var link = frameDoc.getElementsByClassName("ZSS_VARIABLE_MSG")[0].innerHTML;
-
-	//remove extra characters
-	link = link.slice(63, -78);
-	//remove un needed string in links, otherwise reaches incorrect page
-	link = link.replace("amp;", "");
-	link = link.replace("amp;", "");
-	console.log(link);
-	if(link.includes("SA_LEARNER_SERVICES_")){
-		console.log("Contains link");
-		requestSchedule(frameDoc, link)
-	}
-	//console.log(link);
-	
-	//loops until it runs out of professor names to scrape
 	while (profNameParent != null){
 
 		//finding html text of professor name
@@ -327,7 +277,6 @@ function addToolTip(profNameParent, myProf, display){
 
 	}
 
-    //profNameParent is wrapper	
     profNameParent.closest(".PSLEVEL3GRIDROW").appendChild(card);
 
     var cardContainer = profNameParent.closest(".PSLEVEL3GRIDROW").getElementsByClassName('cardContainer')[0];

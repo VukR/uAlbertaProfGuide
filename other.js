@@ -1,6 +1,10 @@
 
+    // var frame = document.getElementsByName("TargetContent")[0];
+    // var frameDoc = frame.contentDocument;
+    // console.log(frameDoc.getElementById("win0divPAGECONTAINER")[1]);
 
     function zssBuildClsGridID( base, day, hour, min ) {
+
         var cellID = base + day;
         if ( hour < 10 ) {
             cellID = cellID + "0";
@@ -117,6 +121,13 @@
     }
 
     function zssScheduleClass(days, startHour, startMin, endHour, endMin, specialFlag, colour, data) {
+
+        var frame = document.getElementsByName("TargetContent")[0];
+        var frameDoc = frame.contentDocument;
+        console.log(frameDoc)
+        //console.log("FrameDoc: " + frameDoc.innerHTML);
+        //console.log(frameDoc.getElementById("win0divPAGECONTAINER")[1]);
+
         var baseRowID = 'zssclsgr';
         var baseCellID = 'zssclsgc';
         var rowSpanCount = 0;
@@ -157,7 +168,12 @@
                                 minuteLoopEnd = 45;
                             }
                             var startRowID =zssBuildClsGridID( baseRowID, '', hLoop, minuteLoopStart );
+                            //console.log("StartRowID value: " + startRowID);
                             var startRow = document.getElementById(startRowID);
+                            //var startRow = frameDoc.getElementById(startRowID);
+                            // console.log("frameDoc: " + frameDoc.documentElement.inner)
+                            // console.log("the document: " + document.documentElement.innerHTML);
+                            //console.log("Row to get index of: " + startRow);
                             var rowIdx = startRow.rowIndex;
                             var maxColIdx = startRow.cells.length - 1;
                             for ( mLoop = minuteLoopStart; mLoop <= minuteLoopEnd; mLoop+=15 ) {
