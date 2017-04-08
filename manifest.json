@@ -6,7 +6,7 @@
 
 	"content_scripts": [
 		{
-			"matches": ["https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.CLASS_*"],
+			"matches": ["https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES*"],
 			"js": [
 				"content.js"
 			]
@@ -14,7 +14,9 @@
 	],
 
 	"permissions": [
-		"https://www.ratemyprofessors.com/*"
+		"https://www.ratemyprofessors.com/*",
+		"tabs",
+		"https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES*"
 	],
 	
 	"background": {

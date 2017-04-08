@@ -38,5 +38,26 @@ https://developer.chrome.com/extensions/runtime#method-sendMessage*/
 		xhttp.send();
 		return true;
 	}
+
+	// else if(request.greeting == "hello"){
+	// 	sendResponse({farewell: "goodbye"});
+	// }
+
+	// else if(request.injectSpecific){
+	// 	chrome.runtime.reload();
+	// 	chrome.tabs.query({url:"https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES*"}, function(tabs){
+	// 		for(var i = 0; i < tabs.length; i++){
+	// 			chrome.tabs.executeScript(tab[i].id, {file: "content.js"}, function(){
+	// 				sendResponse({done: true});
+	// 			});
+	// 		}
+	// 	})
+	// 	//var name = getSpecificName(sender.url);
+	// 	// chrome.tabs.executeScript(sender.tab.id, {file: "content.js"}, function(){
+	// 	// 	sendResponse({done: true});
+	// 	// });
+
+	// 	return true;
+	// }
 	
 });

@@ -1,28 +1,24 @@
 window.onload = function () {
 
- 	var frame = document.getElementsByName("TargetContent")[0];
-	var frameDoc = frame.contentDocument;
 	var count = 0;
-
-	/*listen for change in dom, check if it is the Class Search Result
-	have to listen for dom changes because url does not change, but content we need changes on page
-	poaaibly find a better way of listening if possible*/
-	frameDoc.addEventListener("DOMSubtreeModified", function(){
-
-		try{
-			if ("Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 0){
-				count = 1;
-				grabProfNames(frameDoc)
-			}
-			else if ("Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 1){
-
-			}
+	setInterval(function(){
+		console.log("Intervaled");
+		var frame = document.getElementsByName("TargetContent")[0];
+		var frameDoc = frame.contentDocument || frame.contentWindow.document;
+		console.log("Interval frame Doc");
+		console.log(frameDoc);
+		if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
+			"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 0){
+			count = 1;
+			grabProfNames(frameDoc);
 		}
-		catch(notSearchResults){
+
+		else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) != "Search" ||
+			"Class Search Results" != frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML){
 			count = 0;
 		}
 
-	}, false);
+	}, 5000);
 };
 
 //dictionary of all profs with nicknames/different names on RMP
@@ -132,8 +128,8 @@ function grabProfNames(frameDoc){
 }
 
 /*RMP displays professors page with a special index that they create. 
-To get around not knowing the special index, we first get search results of that prof for university alberta
-using RMP search for prof option, then find professo */ 
+To get around not knowing the special index, we first get search results of that prof for university of alberta
+using RMP search for prof option, then find professor from there */ 
 function getProfURL(profCleanedName, frameDoc, id, multiFlag){
 	
 	chrome.runtime.sendMessage({
