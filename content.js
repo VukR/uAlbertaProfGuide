@@ -1,23 +1,50 @@
 window.onload = function () {
 
+	var frame = document.getElementsByName("TargetContent")[0];
+	var frameDoc = frame.contentDocument || frame.contentWindow.document;
 	var count = 0;
 	setInterval(function(){
 		console.log("Intervaled");
-		var frame = document.getElementsByName("TargetContent")[0];
-		var frameDoc = frame.contentDocument || frame.contentWindow.document;
+		frame = document.getElementsByName("TargetContent")[0];
+		frameDoc = frame.contentDocument || frame.contentWindow.document;
 		console.log("Interval frame Doc");
 		console.log(frameDoc);
 		if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
 			"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 0){
 			count = 1;
+			currentFrameDoc = frameDoc;
 			grabProfNames(frameDoc);
+		}
+
+		// else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
+		// 	"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 1){
+		// 	currentFrameDoc.addEventListener("DOMSubtreeModified", function(){
+		// 		console.log("modified");
+		// 		grabProfNames(currentFrameDoc);
+		// 	})
+		// }
+
+		else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
+			"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && 
+			frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT") != null && count == 1){
+
+			var element = frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT");
+
+			try{
+				element.parentNode.removeChild(element);
+				console.log("Found that error display text");
+
+				grabProfNames(frameDoc);
+			}
+
+			catch(TypeError){
+			}
 		}
 
 		else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) != "Search" ||
 			"Class Search Results" != frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML){
 			count = 0;
 		}
-
 	}, 5000);
 };
 
