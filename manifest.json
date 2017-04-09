@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
-	"name": "uAlbertaRMP",
-	"version": "1.0",
+	"name": "uAlbertaProfGuide",
+	"version": "1.1",
 	"description": "View RMP scores on uAlberta's class enrollment page",
 
 	"content_scripts": [
@@ -14,9 +14,7 @@
 	],
 
 	"permissions": [
-		"https://www.ratemyprofessors.com/*",
-		"tabs",
-		"https://www.beartracks.ualberta.ca/psp/uahebprd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES*"
+		"https://www.ratemyprofessors.com/*"
 	],
 	
 	"background": {
