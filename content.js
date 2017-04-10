@@ -1,24 +1,75 @@
 window.onload = function () {
 
+	// flag for knowing what way to implement results
 	var count = 0;
+	/*
+	Interval every second to make sure to grab the dom of the page. Dom changes a lot, and sometimes it does not modify
+	the dom itself, but changes the whole page without changing of the url. So couldnt get MutationObserver to work.
+	If more time, figure out how to work it correctly.  
+	*/
 	setInterval(function(){
-		console.log("Intervaled");
+
 		var frame = document.getElementsByName("TargetContent")[0];
 		var frameDoc = frame.contentDocument || frame.contentWindow.document;
-		console.log("Interval frame Doc");
-		console.log(frameDoc);
+		
+		//flag is 0, then its the first time the dom has loaded
 		if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
 			"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && count == 0){
-			count = 1;
-			grabProfNames(frameDoc);
+
+			/*
+			if that element exists, then it is a edit of when Add to builder or watchlist was clicked.
+			This solves bug of loading results twice when labs are added.
+			*/
+			if(frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT") != null){
+
+				var element = frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT");
+
+				try{
+					/*
+					remove that element so that it knows to stop implementing results, otherwise
+					will go on forever
+					*/
+
+					element.parentNode.removeChild(element);
+					count = 1;
+
+					grabProfNames(frameDoc);
+				}
+
+				catch(TypeError){
+				}
+			}
+
+			else{
+				count = 1;
+				grabProfNames(frameDoc);
+			}	
 		}
 
+		else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) == "Search" &&
+			"Class Search Results" == frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML && 
+			frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT") != null && count == 1){
+
+			var element = frameDoc.getElementById("DERIVED_CLSMSG_ERROR_TEXT");
+
+			try{
+
+				element.parentNode.removeChild(element);
+				grabProfNames(frameDoc);
+			}
+
+			catch(TypeError){
+			}
+		}
+
+		/*
+		If conditions are not met, reset flag because it is no longer on the proper dom
+		*/
 		else if(frameDoc.getElementsByClassName("SSSTABACTIVE")[0].innerHTML.slice(135, -4) != "Search" ||
 			"Class Search Results" != frameDoc.getElementById("DERIVED_REGFRM1_TITLE1").innerHTML){
 			count = 0;
 		}
-
-	}, 5000);
+	}, 1000);
 };
 
 //dictionary of all profs with nicknames/different names on RMP
@@ -76,6 +127,7 @@ function grabProfNames(frameDoc){
 
 		//finding html text of professor name
 		var profName = profNameParent.getElementsByTagName("div")[0].innerHTML;
+		//check if element will have multiple profs
 		var multiProf = profName.includes("<td");
 		cleanProfName(profName)
 		profCleanedName = profSplit;
@@ -87,23 +139,29 @@ function grabProfNames(frameDoc){
 			profNameParent = frameDoc.getElementById(id);
 		} 
 
-		//if there are multipls instructors for a course
+		//if there are multiple instructors for a course
 		else if (multiProf) {
 			multiProfTable = profNameParent.children[0].children[0];
 
 			//loop through each prof
 			for(var i = 0; i < multiProfTable.rows.length; i++){
 				multiProfName = multiProfTable.rows[i].cells[0].children[0].innerHTML;
+
 				multiProfClean = multiProfName.split(",")
 
-				for(var key in profDic){
-					if(key == multiProfClean[0] + " " + multiProfClean[1]){
-						multiProfClean = profDic[key];
-						break;
-					}
+				if(multiProfClean == "To Be Assigned"){
+					//do nothing
 				}
 
-				getProfURL(multiProfClean, multiProfTable.rows[i], id, 1)
+				else{
+					for(var key in profDic){
+						if(key == multiProfClean[0] + " " + multiProfClean[1]){
+							multiProfClean = profDic[key];
+							break;
+						}
+					}
+					getProfURL(multiProfClean, multiProfTable.rows[i], id, 1)
+				}
 			}
 
 			profIndex += 1;
@@ -259,6 +317,7 @@ function injectRating(frameDoc, id, myProf, display, multiFlag){
 		}
 	}
 
+	//results are shown differently if it is a multi prof
 	else{
 		frameDoc.cells[0].children[0].innerHTML = ("<a href='" + myProf.url + "' target='_blank'>" + frameDoc.cells[0].children[0].innerHTML + " - " + myProf.rating  + "</a>").bold();
 		if(display == 1){
